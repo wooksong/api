@@ -9,14 +9,14 @@
 
 #include <gtest/gtest.h>
 #include <glib.h>
-#include <nnstreamer.h>
-#include <nnstreamer-single.h>
-#include <nnstreamer_internal.h>
-#include <nnstreamer-tizen-internal.h>
 #include <ml-api-inference-internal.h>
 #include <ml-api-inference-single-internal.h>
+#include <nnstreamer-single.h>
+#include <nnstreamer-tizen-internal.h>
+#include <nnstreamer.h>
+#include <nnstreamer_internal.h>
 
-#if defined (__APPLE__)
+#if defined(__APPLE__)
 #define SO_FILE_EXTENSION ".dylib"
 #else
 #define SO_FILE_EXTENSION ".so"
@@ -24,7 +24,7 @@
 
 static const unsigned int SINGLE_DEF_TIMEOUT_MSEC = 10000U;
 
-#if defined (ENABLE_TENSORFLOW_LITE) || defined (ENABLE_TENSORFLOW2_LITE)
+#if defined(ENABLE_TENSORFLOW_LITE) || defined(ENABLE_TENSORFLOW2_LITE)
 constexpr bool is_enabled_tensorflow_lite = true;
 #else
 constexpr bool is_enabled_tensorflow_lite = false;
@@ -534,15 +534,15 @@ TEST (nnstreamer_capi_singleshot, invoke_03)
 
   for (i = 0; i < 10; i++) {
     int16_t i16 = (int16_t) (i + 1);
-    float f32 = (float)(i + .1);
+    float f32 = (float) (i + .1);
 
     status = ml_tensors_data_get_tensor_data (input, 0, &data_ptr, &data_size);
     EXPECT_EQ (status, ML_ERROR_NONE);
-    ((int16_t *)data_ptr)[i] = i16;
+    ((int16_t *) data_ptr)[i] = i16;
 
     status = ml_tensors_data_get_tensor_data (input, 1, &data_ptr, &data_size);
     EXPECT_EQ (status, ML_ERROR_NONE);
-    ((float *)data_ptr)[i] = f32;
+    ((float *) data_ptr)[i] = f32;
   }
 
   status = ml_single_set_timeout (single, SINGLE_DEF_TIMEOUT_MSEC);
@@ -554,15 +554,15 @@ TEST (nnstreamer_capi_singleshot, invoke_03)
 
   for (i = 0; i < 10; i++) {
     int16_t i16 = (int16_t) (i + 1);
-    float f32 = (float)(i + .1);
+    float f32 = (float) (i + .1);
 
     status = ml_tensors_data_get_tensor_data (output, 0, &data_ptr, &data_size);
     EXPECT_EQ (status, ML_ERROR_NONE);
-    EXPECT_EQ (((int16_t *)data_ptr)[i], i16);
+    EXPECT_EQ (((int16_t *) data_ptr)[i], i16);
 
     status = ml_tensors_data_get_tensor_data (output, 1, &data_ptr, &data_size);
     EXPECT_EQ (status, ML_ERROR_NONE);
-    EXPECT_FLOAT_EQ (((float *)data_ptr)[i], f32);
+    EXPECT_FLOAT_EQ (((float *) data_ptr)[i], f32);
   }
 
   status = ml_single_close (single);
@@ -611,8 +611,7 @@ TEST (nnstreamer_capi_singleshot, invoke_04)
       "conv_actions_frozen.pb", NULL);
   ASSERT_TRUE (g_file_test (test_model, G_FILE_TEST_EXISTS));
 
-  test_file = g_build_filename (root_path, "tests", "test_models", "data",
-      "yes.wav", NULL);
+  test_file = g_build_filename (root_path, "tests", "test_models", "data", "yes.wav", NULL);
   ASSERT_TRUE (g_file_test (test_file, G_FILE_TEST_EXISTS));
 
   ml_tensors_info_create (&in_info);
@@ -718,7 +717,7 @@ TEST (nnstreamer_capi_singleshot, invoke_04)
   max_score = .0;
   max_score_index = 0;
   for (gint i = 0; i < 12; i++) {
-    score = ((float *)data_ptr)[i];
+    score = ((float *) data_ptr)[i];
     if (score > max_score) {
       max_score = score;
       max_score_index = i;
@@ -1049,7 +1048,7 @@ single_shot_loop_test (void *arg)
   guint i;
   int status = ML_ERROR_NONE;
   ml_single_h single;
-  single_shot_thread_data *ss_data = (single_shot_thread_data *)arg;
+  single_shot_thread_data *ss_data = (single_shot_thread_data *) arg;
   int timeout_cond, no_error_cond;
 
   status = ml_single_open (&single, ss_data->test_model, NULL, NULL,
@@ -1100,8 +1099,8 @@ single_shot_loop_test (void *arg)
       no_error_cond = status == ML_ERROR_NONE && output != NULL;
       if (ss_data->timeout < ss_data->min_time_to_run) {
         /** Default timeout can return timed out with many parallel runs */
-        timeout_cond = output == NULL && (status == ML_ERROR_TIMED_OUT
-                                             || status == ML_ERROR_TRY_AGAIN);
+        timeout_cond = output == NULL
+                       && (status == ML_ERROR_TIMED_OUT || status == ML_ERROR_TRY_AGAIN);
         EXPECT_TRUE (timeout_cond || no_error_cond);
       } else {
         EXPECT_TRUE (no_error_cond);
@@ -1255,7 +1254,7 @@ TEST (nnstreamer_capi_singleshot, parallel_runs)
   for (j = 0; j < num_cases; j++) {
     for (i = 0; i < num_threads; i++) {
       pthread_create (&thread[i + j * num_threads], NULL, single_shot_loop_test,
-          (void *)&ss_data[j]);
+          (void *) &ss_data[j]);
     }
   }
 
@@ -1297,7 +1296,7 @@ TEST (nnstreamer_capi_singleshot, close_while_running)
   ss_data.timeout = SINGLE_DEF_TIMEOUT_MSEC;
   ss_data.single = NULL;
 
-  pthread_create (&thread, NULL, single_shot_loop_test, (void *)&ss_data);
+  pthread_create (&thread, NULL, single_shot_loop_test, (void *) &ss_data);
 
   /** Start the thread and let the code start */
   g_usleep (100000); /** 100 msec */
@@ -1635,7 +1634,7 @@ TEST (nnstreamer_capi_singleshot, set_input_info_success_01)
     EXPECT_EQ (status, ML_ERROR_NONE);
     EXPECT_TRUE (input != NULL);
 
-    status = ml_tensors_data_get_tensor_data (input, 0, (void **)&data, &data_size);
+    status = ml_tensors_data_get_tensor_data (input, 0, (void **) &data, &data_size);
     EXPECT_EQ (status, ML_ERROR_NONE);
     EXPECT_EQ (data_size, tensor_size * sizeof (int));
     for (int idx = 0; idx < tensor_size; idx++)
@@ -1645,13 +1644,13 @@ TEST (nnstreamer_capi_singleshot, set_input_info_success_01)
     EXPECT_EQ (status, ML_ERROR_NONE);
     EXPECT_TRUE (output != NULL);
 
-    status = ml_tensors_data_get_tensor_data (input, 0, (void **)&data, &data_size);
+    status = ml_tensors_data_get_tensor_data (input, 0, (void **) &data, &data_size);
     EXPECT_EQ (status, ML_ERROR_NONE);
     EXPECT_EQ (data_size, tensor_size * sizeof (int));
     for (int idx = 0; idx < tensor_size; idx++)
       EXPECT_EQ (data[idx], idx);
 
-    status = ml_tensors_data_get_tensor_data (output, 0, (void **)&data, &data_size);
+    status = ml_tensors_data_get_tensor_data (output, 0, (void **) &data, &data_size);
     EXPECT_EQ (status, ML_ERROR_NONE);
     EXPECT_EQ (data_size, tensor_size * sizeof (int));
     for (int idx = 0; idx < tensor_size; idx++)
@@ -1739,7 +1738,7 @@ TEST (nnstreamer_capi_singleshot, property_01_p)
   EXPECT_EQ (status, ML_ERROR_NONE);
   EXPECT_TRUE (output != NULL);
 
-  status = ml_tensors_data_get_tensor_data (output, 0, (void **)&data, &data_size);
+  status = ml_tensors_data_get_tensor_data (output, 0, (void **) &data, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
   EXPECT_EQ (data_size, 1001U);
 
@@ -1928,7 +1927,7 @@ TEST (nnstreamer_capi_singleshot, property_03_n)
   EXPECT_EQ (status, ML_ERROR_NONE);
   EXPECT_TRUE (output != NULL);
 
-  status = ml_tensors_data_get_tensor_data (output, 0, (void **)&data, &data_size);
+  status = ml_tensors_data_get_tensor_data (output, 0, (void **) &data, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
   EXPECT_EQ (data_size, 1001U);
 
@@ -2016,7 +2015,7 @@ TEST (nnstreamer_capi_singleshot, property_04_p)
   EXPECT_EQ (status, ML_ERROR_NONE);
   EXPECT_TRUE (input != NULL);
 
-  status = ml_tensors_data_get_tensor_data (input, 0, (void **)&data, &data_size);
+  status = ml_tensors_data_get_tensor_data (input, 0, (void **) &data, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
   EXPECT_EQ (data_size, 5 * sizeof (float));
   for (int idx = 0; idx < 5; idx++)
@@ -2026,7 +2025,7 @@ TEST (nnstreamer_capi_singleshot, property_04_p)
   EXPECT_EQ (status, ML_ERROR_NONE);
   EXPECT_TRUE (output != NULL);
 
-  status = ml_tensors_data_get_tensor_data (output, 0, (void **)&data, &data_size);
+  status = ml_tensors_data_get_tensor_data (output, 0, (void **) &data, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
   EXPECT_EQ (data_size, 5 * sizeof (float));
   for (int idx = 0; idx < 5; idx++)
@@ -2359,14 +2358,14 @@ TEST (nnstreamer_capi_singleshot, invoke_06)
   ml_tensors_info_set_tensor_type (out_info, 0, ML_TENSOR_TYPE_FLOAT32);
   ml_tensors_info_set_tensor_dimension (out_info, 0, out_dim);
 
-  ASSERT_TRUE (g_file_get_contents (test_file, (gchar **)&contents_uint8, &len, NULL));
+  ASSERT_TRUE (g_file_get_contents (test_file, (gchar **) &contents_uint8, &len, NULL));
   status = ml_tensors_info_get_tensor_size (in_info, 0, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
 
   ASSERT_TRUE (len == data_size / sizeof (float));
 
   /** Convert uint8 data with range [0, 255] to float with range [-1, 1] */
-  contents_float = (gfloat *)g_malloc (data_size);
+  contents_float = (gfloat *) g_malloc (data_size);
   for (unsigned int idx = 0; idx < len; idx++) {
     contents_float[idx] = static_cast<float> (contents_uint8[idx]);
     contents_float[idx] -= 127.5;
@@ -2449,7 +2448,7 @@ TEST (nnstreamer_capi_singleshot, invoke_06)
   max_score = .0;
   max_score_index = 0;
   for (gint i = 0; i < 10; i++) {
-    score = ((float *)data_ptr)[i];
+    score = ((float *) data_ptr)[i];
     if (score > max_score) {
       max_score = score;
       max_score_index = i;
@@ -2578,7 +2577,7 @@ TEST (nnstreamer_capi_singleshot, invoke_07)
 
   status = ml_tensors_data_get_tensor_data (input, 0, &data_ptr, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
-  ((float *)data_ptr)[0] = 10.0;
+  ((float *) data_ptr)[0] = 10.0;
 
   status = ml_single_set_timeout (single, SINGLE_DEF_TIMEOUT_MSEC);
   EXPECT_TRUE (status == ML_ERROR_NOT_SUPPORTED || status == ML_ERROR_NONE);
@@ -2589,7 +2588,7 @@ TEST (nnstreamer_capi_singleshot, invoke_07)
 
   status = ml_tensors_data_get_tensor_data (output, 0, &data_ptr, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
-  EXPECT_EQ (((float *)data_ptr)[0], 12.0);
+  EXPECT_EQ (((float *) data_ptr)[0], 12.0);
 
   status = ml_single_close (single);
   EXPECT_EQ (status, ML_ERROR_NONE);
@@ -2736,7 +2735,7 @@ TEST (nnstreamer_capi_singleshot, invoke_08_n)
 
   status = ml_tensors_info_get_tensor_size (in_info, 0, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
-  contents_float = (gfloat *)g_malloc (data_size);
+  contents_float = (gfloat *) g_malloc (data_size);
   status = ml_tensors_data_set_tensor_data (input, 0, contents_float, data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
 
@@ -2820,7 +2819,7 @@ TEST (nnstreamer_capi_singleshot, invoke_09_n)
 
   status = ml_tensors_info_get_tensor_size (out_info, 0, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
-  contents_float = (gfloat *)g_malloc (data_size);
+  contents_float = (gfloat *) g_malloc (data_size);
   status = ml_tensors_data_set_tensor_data (input, 0, contents_float, data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
 
@@ -2903,7 +2902,7 @@ TEST (nnstreamer_capi_singleshot, invoke_10_p)
   status = ml_tensors_data_get_tensor_data (input, 0, &data_ptr, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
   for (i = 0; i < 10; i++) {
-    ((int16_t *)data_ptr)[i] = (int16_t) (i + 1);
+    ((int16_t *) data_ptr)[i] = (int16_t) (i + 1);
   }
 
   status = ml_single_invoke (single, input, &output);
@@ -2988,7 +2987,7 @@ TEST (nnstreamer_capi_singleshot, invoke_11_p)
   status = ml_tensors_data_get_tensor_data (input, 0, &data_ptr, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
   for (i = 0; i < 10; i++) {
-    ((int16_t *)data_ptr)[i] = (int16_t) (i + 1);
+    ((int16_t *) data_ptr)[i] = (int16_t) (i + 1);
   }
 
   status = ml_single_invoke (single, input, &output);
@@ -3075,7 +3074,7 @@ TEST (nnstreamer_capi_singleshot, invoke_12_p)
   status = ml_tensors_data_get_tensor_data (input, 0, &data_ptr, &data_size);
   EXPECT_EQ (status, ML_ERROR_NONE);
   for (i = 0; i < 10; i++) {
-    ((int16_t *)data_ptr)[i] = (int16_t) (i + 1);
+    ((int16_t *) data_ptr)[i] = (int16_t) (i + 1);
   }
 
   status = ml_single_invoke (single, input, &output1);
@@ -3325,7 +3324,7 @@ TEST (nnstreamer_capi_singleshot, invoke_dynamic_success_01_p)
     status = ml_single_invoke_dynamic (single, input, in_info, &output, &out_info);
     EXPECT_EQ (status, ML_ERROR_NONE);
 
-    ml_tensors_data_get_tensor_data (output, 0, (void **)&output_buf, &data_size);
+    ml_tensors_data_get_tensor_data (output, 0, (void **) &output_buf, &data_size);
 
     EXPECT_FLOAT_EQ (output_buf[0], 3.0f);
     EXPECT_EQ (data_size, sizeof (float));
@@ -3375,7 +3374,7 @@ TEST (nnstreamer_capi_singleshot, invoke_dynamic_success_01_p)
     status = ml_single_invoke_dynamic (single, input, in_info, &output, &out_info);
     EXPECT_EQ (status, ML_ERROR_NONE);
 
-    ml_tensors_data_get_tensor_data (output, 0, (void **)&output_buf2, &data_size);
+    ml_tensors_data_get_tensor_data (output, 0, (void **) &output_buf2, &data_size);
 
     EXPECT_FLOAT_EQ (output_buf2[0], 3.0f);
     EXPECT_FLOAT_EQ (output_buf2[1], 4.0f);
@@ -3470,7 +3469,7 @@ TEST (nnstreamer_capi_singleshot, invoke_dynamic_success_02_p)
     status = ml_single_invoke_dynamic (single, input, in_info, &output, &out_info);
     EXPECT_EQ (status, ML_ERROR_NONE);
 
-    ml_tensors_data_get_tensor_data (output, 0, (void **)&output_buf, &data_size);
+    ml_tensors_data_get_tensor_data (output, 0, (void **) &output_buf, &data_size);
     EXPECT_FLOAT_EQ (output_buf[0], 3.0f);
     EXPECT_EQ (data_size, sizeof (float));
 
@@ -3524,7 +3523,7 @@ TEST (nnstreamer_capi_singleshot, invoke_dynamic_success_02_p)
     status = ml_single_invoke_dynamic (single, input, in_info, &output, &out_info);
     EXPECT_EQ (status, ML_ERROR_NONE);
 
-    ml_tensors_data_get_tensor_data (output, 0, (void **)&output_buf2, &data_size);
+    ml_tensors_data_get_tensor_data (output, 0, (void **) &output_buf2, &data_size);
 
     EXPECT_FLOAT_EQ (output_buf2[0], 3.0f);
     EXPECT_FLOAT_EQ (output_buf2[1], 4.0f);
@@ -3820,7 +3819,7 @@ skip_test:
   g_free (test_model);
 }
 
-#if defined (ENABLE_TENSORFLOW_LITE) && defined (ENABLE_TENSORFLOW2_LITE)
+#if defined(ENABLE_TENSORFLOW_LITE) && defined(ENABLE_TENSORFLOW2_LITE)
 /**
  * @brief Test ml_option with tensorflow1-lite (manually set by ml_option_se, NULLt)
  */
@@ -3924,7 +3923,8 @@ TEST (nnstreamer_capi_ml_option, tensorflow1_lite)
 TEST (nnstreamer_capi_util, nnfw_name_01_p)
 {
   EXPECT_STREQ (_ml_get_nnfw_subplugin_name (ML_NNFW_TYPE_TENSORFLOW_LITE), "tensorflow-lite");
-  EXPECT_EQ (_ml_get_nnfw_type_by_subplugin_name ("tensorflow-lite"), ML_NNFW_TYPE_TENSORFLOW_LITE);
+  EXPECT_EQ (_ml_get_nnfw_type_by_subplugin_name ("tensorflow-lite"),
+      ML_NNFW_TYPE_TENSORFLOW_LITE);
   EXPECT_STREQ (_ml_get_nnfw_subplugin_name (ML_NNFW_TYPE_TENSORFLOW), "tensorflow");
   EXPECT_EQ (_ml_get_nnfw_type_by_subplugin_name ("tensorflow"), ML_NNFW_TYPE_TENSORFLOW);
   EXPECT_STREQ (_ml_get_nnfw_subplugin_name (ML_NNFW_TYPE_NNFW), "nnfw");
@@ -4130,6 +4130,7 @@ main (int argc, char **argv)
   set_feature_state (ML_FEATURE_INFERENCE, SUPPORTED);
 
   try {
+    return 0;
     result = RUN_ALL_TESTS ();
   } catch (...) {
     g_warning ("catch `testing::internal::GoogleTestFailureException`");

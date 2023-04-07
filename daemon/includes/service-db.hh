@@ -13,8 +13,9 @@
 #ifndef __SERVICE_DB_HH__
 #define __SERVICE_DB_HH__
 
-#include <sqlite3.h>
+#include <glib/gtypes.h>
 #include <iostream>
+#include <sqlite3.h>
 
 /**
  * @brief Class for ML-Service Database.

@@ -271,18 +271,29 @@ MLServiceDB::get_pipeline (const std::string name, std::string &description)
   if (name.empty ())
     throw std::invalid_argument ("Invalid name parameters!");
 
+  g_critical("[get_pipeline]############### name = %s\n", name.c_str());
   std::string key_with_prefix = DB_KEY_PREFIX;
   key_with_prefix += name;
 
+  g_critical("[get_pipeline]############### key_with_prefix = %s\n", key_with_prefix.c_str());
+
   if (sqlite3_prepare_v2 (_db, "SELECT description FROM tblPipeline WHERE key = ?1", -1, &res, nullptr) == SQLITE_OK &&
       sqlite3_bind_text (res, 1, key_with_prefix.c_str (), -1, NULL) == SQLITE_OK &&
-      sqlite3_step (res) == SQLITE_ROW)
+      sqlite3_step (res) == SQLITE_ROW) {
     value = g_strdup_printf ("%s", sqlite3_column_text (res, 0));
+    g_critical("value = %s\n", value);
+      }
+
+  if (value == nullptr) {
+      g_critical("[get_pipeline]############### value is nullptr\n");
+  }
 
   sqlite3_finalize (res);
 
   if (value) {
     description = std::string (value);
+    g_critical("[get_pipeline]description = %s (%lu)\n", description.c_str(), description.length());
+
     g_free (value);
   } else {
     throw std::invalid_argument ("Failed to get pipeline description of " + name);

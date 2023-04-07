@@ -10,15 +10,15 @@
  * @bug No known bugs except for NYI items
  */
 
-#include <glib.h>
 #include <errno.h>
+#include <glib.h>
 
 #include "common.h"
-#include "modules.h"
-#include "gdbus-util.h"
 #include "dbus-interface.h"
-#include "model-dbus.h"
+#include "gdbus-util.h"
 #include "log.h"
+#include "model-dbus.h"
+#include "modules.h"
 #include "service-db.hh"
 
 static MachinelearningServiceModel *g_gdbus_instance = NULL;
@@ -36,7 +36,7 @@ gdbus_get_model_instance (void)
  * @brief Utility function to release DBus proxy of Model interface.
  */
 static void
-gdbus_put_model_instance (MachinelearningServiceModel ** instance)
+gdbus_put_model_instance (MachinelearningServiceModel **instance)
 {
   g_clear_object (instance);
 }
@@ -53,16 +53,12 @@ gdbus_put_model_instance (MachinelearningServiceModel ** instance)
  * @return @c TRUE if the request is handled. FALSE if the service is not available.
  */
 static gboolean
-gdbus_cb_model_register (MachinelearningServiceModel *obj,
-    GDBusMethodInvocation *invoc,
-    const gchar *name,
-    const gchar *path,
-    const bool is_active,
-    const gchar *description)
+gdbus_cb_model_register (MachinelearningServiceModel *obj, GDBusMethodInvocation *invoc,
+    const gchar *name, const gchar *path, const bool is_active, const gchar *description)
 {
   int ret = 0;
   guint version = 0U;
-  MLServiceDB & db = MLServiceDB::getInstance ();
+  MLServiceDB &db = MLServiceDB::getInstance ();
 
   try {
     db.connectDB ();
@@ -93,13 +89,11 @@ gdbus_cb_model_register (MachinelearningServiceModel *obj,
  */
 static gboolean
 gdbus_cb_model_update_description (MachinelearningServiceModel *obj,
-    GDBusMethodInvocation *invoc,
-    const gchar *name,
-    const guint version,
+    GDBusMethodInvocation *invoc, const gchar *name, const guint version,
     const gchar *description)
 {
   int ret = 0;
-  MLServiceDB & db = MLServiceDB::getInstance ();
+  MLServiceDB &db = MLServiceDB::getInstance ();
 
   try {
     db.connectDB ();
@@ -129,12 +123,10 @@ gdbus_cb_model_update_description (MachinelearningServiceModel *obj,
  */
 static gboolean
 gdbus_cb_model_activate (MachinelearningServiceModel *obj,
-    GDBusMethodInvocation *invoc,
-    const gchar *name,
-    const guint version)
+    GDBusMethodInvocation *invoc, const gchar *name, const guint version)
 {
   int ret = 0;
-  MLServiceDB & db = MLServiceDB::getInstance ();
+  MLServiceDB &db = MLServiceDB::getInstance ();
 
   try {
     db.connectDB ();
@@ -163,13 +155,11 @@ gdbus_cb_model_activate (MachinelearningServiceModel *obj,
  */
 static gboolean
 gdbus_cb_model_get (MachinelearningServiceModel *obj,
-    GDBusMethodInvocation *invoc,
-    const gchar *name,
-    const guint version)
+    GDBusMethodInvocation *invoc, const gchar *name, const guint version)
 {
   int ret = 0;
   std::string model_info;
-  MLServiceDB & db = MLServiceDB::getInstance ();
+  MLServiceDB &db = MLServiceDB::getInstance ();
 
   try {
     db.connectDB ();
@@ -183,7 +173,8 @@ gdbus_cb_model_get (MachinelearningServiceModel *obj,
   }
 
   db.disconnectDB ();
-  machinelearning_service_model_complete_get_activated (obj, invoc, model_info.c_str (), ret);
+  machinelearning_service_model_complete_get_activated (
+      obj, invoc, model_info.c_str (), ret);
 
   return TRUE;
 }
@@ -198,12 +189,11 @@ gdbus_cb_model_get (MachinelearningServiceModel *obj,
  */
 static gboolean
 gdbus_cb_model_get_activated (MachinelearningServiceModel *obj,
-    GDBusMethodInvocation *invoc,
-    const gchar *name)
+    GDBusMethodInvocation *invoc, const gchar *name)
 {
   int ret = 0;
   std::string model_info;
-  MLServiceDB & db = MLServiceDB::getInstance ();
+  MLServiceDB &db = MLServiceDB::getInstance ();
 
   try {
     db.connectDB ();
@@ -217,7 +207,8 @@ gdbus_cb_model_get_activated (MachinelearningServiceModel *obj,
   }
 
   db.disconnectDB ();
-  machinelearning_service_model_complete_get_activated (obj, invoc, model_info.c_str (), ret);
+  machinelearning_service_model_complete_get_activated (
+      obj, invoc, model_info.c_str (), ret);
 
   return TRUE;
 }
@@ -232,12 +223,10 @@ gdbus_cb_model_get_activated (MachinelearningServiceModel *obj,
  */
 static gboolean
 gdbus_cb_model_get_all (MachinelearningServiceModel *obj,
-    GDBusMethodInvocation *invoc,
-    const gchar *name
-    )
+    GDBusMethodInvocation *invoc, const gchar *name)
 {
   int ret = 0;
-  MLServiceDB & db = MLServiceDB::getInstance ();
+  MLServiceDB &db = MLServiceDB::getInstance ();
   std::string all_model_list;
 
   try {
@@ -269,12 +258,10 @@ gdbus_cb_model_get_all (MachinelearningServiceModel *obj,
  */
 static gboolean
 gdbus_cb_model_delete (MachinelearningServiceModel *obj,
-    GDBusMethodInvocation *invoc,
-    const gchar *name,
-    const guint version)
+    GDBusMethodInvocation *invoc, const gchar *name, const guint version)
 {
   int ret = 0;
-  MLServiceDB & db = MLServiceDB::getInstance ();
+  MLServiceDB &db = MLServiceDB::getInstance ();
 
   try {
     db.connectDB ();
@@ -296,44 +283,49 @@ gdbus_cb_model_delete (MachinelearningServiceModel *obj,
 /**
  * @brief Event handler list of Model interface
  */
-static struct gdbus_signal_info handler_infos[] = {
-  {
-    .signal_name = DBUS_MODEL_I_HANDLER_REGISTER,
-    .cb = G_CALLBACK (gdbus_cb_model_register),
-    .cb_data = NULL,
-    .handler_id = 0,
-  }, {
-    .signal_name = DBUS_MODEL_I_HANDLER_UPDATE_DESCRIPTION,
-    .cb = G_CALLBACK (gdbus_cb_model_update_description),
-    .cb_data = NULL,
-    .handler_id = 0,
-  }, {
-    .signal_name = DBUS_MODEL_I_HANDLER_ACTIVATE,
-    .cb = G_CALLBACK (gdbus_cb_model_activate),
-    .cb_data = NULL,
-    .handler_id = 0,
-  }, {
-    .signal_name = DBUS_MODEL_I_HANDLER_GET,
-    .cb = G_CALLBACK (gdbus_cb_model_get),
-    .cb_data = NULL,
-    .handler_id = 0,
-  }, {
-    .signal_name = DBUS_MODEL_I_HANDLER_GET_ACTIVATED,
-    .cb = G_CALLBACK (gdbus_cb_model_get_activated),
-    .cb_data = NULL,
-    .handler_id = 0,
-  }, {
-    .signal_name = DBUS_MODEL_I_HANDLER_GET_ALL,
-    .cb = G_CALLBACK (gdbus_cb_model_get_all),
-    .cb_data = NULL,
-    .handler_id = 0,
-  }, {
-    .signal_name = DBUS_MODEL_I_HANDLER_DELETE,
-    .cb = G_CALLBACK (gdbus_cb_model_delete),
-    .cb_data = NULL,
-    .handler_id = 0,
-  }
-};
+static struct gdbus_signal_info handler_infos[]
+    = { {
+            .signal_name = DBUS_MODEL_I_HANDLER_REGISTER,
+            .cb = G_CALLBACK (gdbus_cb_model_register),
+            .cb_data = NULL,
+            .handler_id = 0,
+        },
+        {
+            .signal_name = DBUS_MODEL_I_HANDLER_UPDATE_DESCRIPTION,
+            .cb = G_CALLBACK (gdbus_cb_model_update_description),
+            .cb_data = NULL,
+            .handler_id = 0,
+        },
+        {
+            .signal_name = DBUS_MODEL_I_HANDLER_ACTIVATE,
+            .cb = G_CALLBACK (gdbus_cb_model_activate),
+            .cb_data = NULL,
+            .handler_id = 0,
+        },
+        {
+            .signal_name = DBUS_MODEL_I_HANDLER_GET,
+            .cb = G_CALLBACK (gdbus_cb_model_get),
+            .cb_data = NULL,
+            .handler_id = 0,
+        },
+        {
+            .signal_name = DBUS_MODEL_I_HANDLER_GET_ACTIVATED,
+            .cb = G_CALLBACK (gdbus_cb_model_get_activated),
+            .cb_data = NULL,
+            .handler_id = 0,
+        },
+        {
+            .signal_name = DBUS_MODEL_I_HANDLER_GET_ALL,
+            .cb = G_CALLBACK (gdbus_cb_model_get_all),
+            .cb_data = NULL,
+            .handler_id = 0,
+        },
+        {
+            .signal_name = DBUS_MODEL_I_HANDLER_DELETE,
+            .cb = G_CALLBACK (gdbus_cb_model_delete),
+            .cb_data = NULL,
+            .handler_id = 0,
+        } };
 
 /**
  * @brief The callback function for probing Model Interface module.
@@ -346,16 +338,13 @@ probe_model_module (void *data)
 
   g_gdbus_instance = gdbus_get_model_instance ();
   if (NULL == g_gdbus_instance) {
-    _E ("cannot get a dbus instance for the %s interface\n",
-        DBUS_MODEL_INTERFACE);
+    _E ("cannot get a dbus instance for the %s interface\n", DBUS_MODEL_INTERFACE);
     return -ENOSYS;
   }
 
-  ret = gdbus_connect_signal (g_gdbus_instance,
-      ARRAY_SIZE(handler_infos), handler_infos);
+  ret = gdbus_connect_signal (g_gdbus_instance, ARRAY_SIZE (handler_infos), handler_infos);
   if (ret < 0) {
-    _E ("cannot register callbacks as the dbus method invocation handlers\n ret: %d",
-        ret);
+    _E ("cannot register callbacks as the dbus method invocation handlers\n ret: %d", ret);
     ret = -ENOSYS;
     goto out;
   }
@@ -371,8 +360,7 @@ probe_model_module (void *data)
   return 0;
 
 out_disconnect:
-  gdbus_disconnect_signal (g_gdbus_instance,
-    ARRAY_SIZE (handler_infos), handler_infos);
+  gdbus_disconnect_signal (g_gdbus_instance, ARRAY_SIZE (handler_infos), handler_infos);
 
 out:
   gdbus_put_model_instance (&g_gdbus_instance);
@@ -384,7 +372,9 @@ out:
  * @brief The callback function for initializing Model Interface module.
  */
 static void
-init_model_module (void *data) { }
+init_model_module (void *data)
+{
+}
 
 /**
  * @brief The callback function for exiting Model Interface module.
@@ -392,8 +382,7 @@ init_model_module (void *data) { }
 static void
 exit_model_module (void *data)
 {
-  gdbus_disconnect_signal (g_gdbus_instance,
-    ARRAY_SIZE (handler_infos), handler_infos);
+  gdbus_disconnect_signal (g_gdbus_instance, ARRAY_SIZE (handler_infos), handler_infos);
   gdbus_put_model_instance (&g_gdbus_instance);
 }
 

@@ -88,11 +88,14 @@ ml_service_query_create (ml_option_h option, ml_service_h * h)
   check_feature_state (ML_FEATURE_SERVICE);
   check_feature_state (ML_FEATURE_INFERENCE);
 
+  g_critical("[ml_service_query_create] !option\n");
   if (!option) {
     _ml_error_report_return (ML_ERROR_INVALID_PARAMETER,
         "The parameter, 'option' is NULL. It should be a valid ml_option_h, which should be created by ml_option_create().");
   }
 
+
+  g_critical("[ml_service_query_create] !h\n");
   if (!h) {
     _ml_error_report_return (ML_ERROR_INVALID_PARAMETER,
         "The parameter, 'h' (ml_service_h), is NULL. It should be a valid ml_service_h.");
@@ -132,6 +135,8 @@ ml_service_query_create (ml_option_h option, ml_service_h * h)
     }
   }
 
+
+  g_critical("[ml_service_query_create] !caps\n");
   if (!caps) {
     g_string_free (tensor_query_client_prop, TRUE);
     _ml_error_report_return (ML_ERROR_INVALID_PARAMETER,
@@ -149,11 +154,15 @@ ml_service_query_create (ml_option_h option, ml_service_h * h)
 
   status = ml_pipeline_construct (description, NULL, NULL, &pipe_h);
   g_free (description);
+    g_critical("[ml_service_query_create] ml_pipeline_construct status = %d\n", status);
+
   if (ML_ERROR_NONE != status) {
     _ml_error_report_return (status, "Failed to construct pipeline");
   }
 
   status = ml_pipeline_start (pipe_h);
+      g_critical("[ml_service_query_create] ml_pipeline_start status = %d\n", status);
+
   if (ML_ERROR_NONE != status) {
     _ml_error_report ("Failed to start pipeline");
     ml_pipeline_destroy (pipe_h);
@@ -161,6 +170,8 @@ ml_service_query_create (ml_option_h option, ml_service_h * h)
   }
 
   status = ml_pipeline_src_get_handle (pipe_h, "srcx", &src_h);
+        g_critical("[ml_service_query_create] ml_pipeline_src_get_handle status = %d\n", status);
+
   if (ML_ERROR_NONE != status) {
     ml_pipeline_destroy (pipe_h);
     _ml_error_report_return (status, "Failed to get src handle");
@@ -169,6 +180,8 @@ ml_service_query_create (ml_option_h option, ml_service_h * h)
   query_s = g_new0 (_ml_service_query_s, 1);
   status = ml_pipeline_sink_register (pipe_h, "sinkx",
       _sink_callback_for_query_client, query_s, &sink_h);
+              g_critical("[ml_service_query_create] ml_pipeline_sink_register status = %d\n", status);
+
   if (ML_ERROR_NONE != status) {
     ml_pipeline_destroy (pipe_h);
     g_free (query_s);

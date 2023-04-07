@@ -1,0 +1,48 @@
+{
+  "C_Cpp.default.includePath": [
+    "./include",
+    "./includes",
+    "**/include",
+    "**/includes",
+    "/usr/include/glib-2.0",
+    "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
+    "/usr/src/googletest/googletest/include"
+  ],
+  "files.associations": {
+    "*.cc": "cpp",
+    "ml-api-service-private.h": "c",
+    "typeinfo": "c",
+    "functional": "cpp",
+    "*.tcc": "cpp",
+    "optional": "cpp",
+    "istream": "cpp",
+    "ostream": "cpp",
+    "system_error": "cpp",
+    "array": "cpp",
+    "tuple": "cpp",
+    "type_traits": "cpp",
+    "utility": "cpp",
+    "stdexcept": "cpp"
+  },
+  "customLocalFormatters.formatters": [
+    {
+      "command": "gst-indent",
+      "languages": ["c"]
+    },
+    {
+      "command": "clang-format --style=file",
+      "languages": ["cpp"]
+    }
+  ],
+  "editor.formatOnSave": false,
+  "editor.formatOnSaveMode": "modifications",
+  "editor.defaultFormatter": "jkillian.custom-local-formatters",
+  "C_Cpp.clang_format_path": "/usr/bin/clang-format",
+  "[cpp]": {
+    "editor.defaultFormatter": "jkillian.custom-local-formatters"
+  },
+  "[c]": {
+    "editor.defaultFormatter": "jkillian.custom-local-formatters"
+  },
+  "C_Cpp.errorSquiggles": "disabled"
+}
